@@ -15,12 +15,12 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class LoginController {
 
 	/**
-	 * Go login.jsp
+	 * Go login
 	 * @return
 	 */
 	@RequestMapping(value="login", method=RequestMethod.GET)
 	public String login() {
-		return "login.jsp";
+		return "login";
 	}
 	
 	/**

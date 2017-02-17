@@ -12,7 +12,7 @@ public class IndexController {
 	 */
 	@RequestMapping(value={"", "/", "index"})
 	public String index() {
-		return "index.jsp";
+		return "index";
 	}
 	
 	/**
@@ -21,7 +21,7 @@ public class IndexController {
 	 */
 	@RequestMapping("unauthor")
 	public String unauthor() {
-		return "unauthor.jsp";
+		return "unauthor";
 	}
 	
 	/**
@@ -30,6 +30,6 @@ public class IndexController {
 	 */
 	@RequestMapping("reports")
 	public String reports() {
-		return "reports.jsp";
+		return "reports";
 	}
 }
