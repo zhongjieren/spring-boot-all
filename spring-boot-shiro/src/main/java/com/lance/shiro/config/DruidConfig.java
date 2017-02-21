@@ -25,7 +25,7 @@ public class DruidConfig {
 		druid.setServlet(new StatViewServlet());
 		druid.setUrlMappings(Arrays.asList("/druid/*"));
 		
-		Map<String,String> params = new HashMap<>();
+		Map<String,String> params = new HashMap<String,String>();
 		params.put("loginUsername", "admin");
 		params.put("loginPassword", "admin");
 		druid.setInitParameters(params);

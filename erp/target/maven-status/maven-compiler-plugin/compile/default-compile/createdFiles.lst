@@ -1,0 +1,16 @@
+com\spbm\common\security\shiro\config\SystemAuthorizingRealm.class
+com\spbm\modules\sys\services\ModuleService.class
+com\spbm\modules\sys\web\IndexController.class
+com\spbm\common\security\shiro\filter\RetryLimitHashedCredentialsMatcher.class
+com\spbm\ApplicationConfiguration.class
+com\spbm\common\security\druid\DruidConfig.class
+com\spbm\modules\sys\domain\UserInfo.class
+com\spbm\modules\sys\services\impl\UserServiceImpl.class
+com\spbm\modules\sys\dao\UserMapper.class
+com\spbm\common\security\shiro\filter\URLPermissionsShiroFilter.class
+com\spbm\common\security\shiro\config\ShiroConfig.class
+com\spbm\modules\sys\domain\ModuleInfo.class
+com\spbm\modules\sys\dao\ModuleMapper.class
+com\spbm\modules\sys\services\impl\ModuleServiceImpl.class
+com\spbm\modules\sys\web\LoginController.class
+com\spbm\modules\sys\services\UserService.class
