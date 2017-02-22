@@ -9,6 +9,8 @@ import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheManager;
 
+import com.spbm.common.utils.JsonUtil;
+
 public class RetryLimitHashedCredentialsMatcher extends
 		HashedCredentialsMatcher {
 
@@ -32,13 +34,15 @@ public class RetryLimitHashedCredentialsMatcher extends
 			// if retry count > 5 throw
 			throw new ExcessiveAttemptsException();
 		}
-
+		System.out.println("CredentialsMatch token:"+JsonUtil.getJson(token));
+		System.out.println("CredentialsMatch info:"+JsonUtil.getJson(info));
+		//验证是否正确
 		boolean matches = super.doCredentialsMatch(token, info);
+		System.out.println("CredentialsMatch Result:"+matches);
 		if (matches) {
 			// clear retry count
 			passwordRetryCache.remove(username);
 		}
 		return matches;
-	}
-
+	} 
 }

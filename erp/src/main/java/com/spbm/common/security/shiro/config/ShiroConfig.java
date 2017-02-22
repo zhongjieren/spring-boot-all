@@ -21,6 +21,7 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.web.filter.DelegatingFilterProxy;
 
 import com.google.common.collect.Maps;
+import com.spbm.common.security.shiro.filter.FormAuthenticationFilter;
 import com.spbm.common.security.shiro.filter.RetryLimitHashedCredentialsMatcher;
 import com.spbm.common.security.shiro.filter.URLPermissionsShiroFilter;
 
@@ -55,10 +56,12 @@ public class ShiroConfig {
 		Map<String, Filter> filters = Maps.newHashMap();
 		filters.put("perms", urlPermissionsFilter());
 		filters.put("anon", new AnonymousFilter());
+		filters.put("authc", new FormAuthenticationFilter());
 		bean.setFilters(filters);
 		
 		Map<String, String> chains = Maps.newHashMap();
-		chains.put("/login", "anon");
+		chains.put("/login", "authc");
+//		chains.put("/", "anon");
 		chains.put("/unauthor", "anon");
 		chains.put("/logout", "logout");
 		chains.put("/base/**", "anon");
@@ -117,26 +120,6 @@ public class ShiroConfig {
 	}
 
 	/**
-	 * 凭证匹配器 （由于我们的密码校验交给Shiro的SimpleAuthenticationInfo进行处理了
-	 * 所以我们需要修改下doGetAuthenticationInfo中的代码; ）
-	 * 
-	 * @return
-	 */
-	@Bean(name = "hashedCredentialsMatcher")
-	public HashedCredentialsMatcher hashedCredentialsMatcher() {
-		// 验证错误次数限制
-		HashedCredentialsMatcher hashedCredentialsMatcher = new RetryLimitHashedCredentialsMatcher(
-				cacheManager());
-		// new HashedCredentialsMatcher();
-
-		hashedCredentialsMatcher.setHashAlgorithmName("md5");// 散列算法:这里使用MD5算法;
-		hashedCredentialsMatcher.setHashIterations(2);// 散列的次数，比如散列两次，相当于
-														// md5(md5(""));
-
-		return hashedCredentialsMatcher;
-	}
-	
-	/**
 	 * 开启shiro aop注解支持. 使用代理方式;所以需要开启代码支持;
 	 * 
 	 * @param securityManager
@@ -175,7 +158,7 @@ public class ShiroConfig {
 		SystemAuthorizingRealm myShiroRealm = new SystemAuthorizingRealm();
 		//Cache
 		myShiroRealm.setCacheManager(cacheManager());
-		//Credentials
+		
 		myShiroRealm.setCredentialsMatcher(hashedCredentialsMatcher());
 		return myShiroRealm;
 	}
@@ -184,7 +167,25 @@ public class ShiroConfig {
 	public URLPermissionsShiroFilter urlPermissionsFilter() {
 		return new URLPermissionsShiroFilter();
 	}
-	
+	/**
+	 * 凭证匹配器 （由于我们的密码校验交给Shiro的SimpleAuthenticationInfo进行处理了
+	 * 所以我们需要修改下doGetAuthenticationInfo中的代码; ）
+	 * 
+	 * @return
+	 */
+	@Bean(name = "hashedCredentialsMatcher")
+	public HashedCredentialsMatcher hashedCredentialsMatcher() {
+		// 验证错误次数限制
+		HashedCredentialsMatcher hashedCredentialsMatcher = new RetryLimitHashedCredentialsMatcher(
+				cacheManager());
+		// new HashedCredentialsMatcher();
+		
+		hashedCredentialsMatcher.setHashAlgorithmName("MD5");// 散列算法:这里使用MD5算法;
+		hashedCredentialsMatcher.setHashIterations(1);// 散列的次数，比如散列两次，相当于
+														// md5(md5(""));
+
+		return hashedCredentialsMatcher;
+	}
 	@Bean
 	public EhCacheManager cacheManager() {
 		EhCacheManager cacheManager = new EhCacheManager();

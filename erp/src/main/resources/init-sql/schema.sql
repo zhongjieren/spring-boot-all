@@ -22,7 +22,7 @@ CREATE TABLE `t_module` (
 -- Records of t_module
 -- ----------------------------
 INSERT INTO `t_module` VALUES ('1', 'Overview', '/index', '1', 'IndexUrl', '2016-06-01 23:41:39');
-INSERT INTO `t_module` VALUES ('2', 'Reports', null, '1', 'Reports', '2016-06-02 09:42:17');
+INSERT INTO `t_module` VALUES ('2', 'Reports', '/', '1', 'Reports', '2016-06-02 09:42:17');
 INSERT INTO `t_module` VALUES ('3', 'Analytics', null, '1', 'Analytics', '2016-06-03 21:42:17');
 INSERT INTO `t_module` VALUES ('4', 'Export', null, '1', 'Export', '2016-06-03 20:38:01');
 INSERT INTO `t_module` VALUES ('5', 'Nav item', null, '1', 'Nav_item', '2016-06-03 20:38:04');
@@ -49,7 +49,8 @@ CREATE TABLE `t_role` (
 -- ----------------------------
 -- Records of t_role
 -- ----------------------------
-INSERT INTO `t_role` VALUES ('1', '管理员', '系统管理员', '2016-06-01 23:41:11');
+INSERT INTO `t_role` VALUES ('1', 'ADMIN', '系统管理员', '2016-06-01 23:41:11');
+INSERT INTO `t_role` VALUES ('2', 'USER', '用户', '2016-06-01 23:41:11');
 
 -- ----------------------------
 -- Table structure for `t_role_module`
@@ -77,7 +78,8 @@ INSERT INTO `t_role_module` VALUES ('9', '1', '9');
 INSERT INTO `t_role_module` VALUES ('10', '1', '10');
 INSERT INTO `t_role_module` VALUES ('11', '1', '11');
 INSERT INTO `t_role_module` VALUES ('12', '1', '12');
-
+INSERT INTO `t_role_module` VALUES ('13', '2', '1');
+INSERT INTO `t_role_module` VALUES ('24', '2', '2');
 -- ----------------------------
 -- Table structure for `t_user`
 -- ----------------------------
@@ -87,6 +89,7 @@ CREATE TABLE `t_user` (
   `account` varchar(32) DEFAULT NULL,
   `password` varchar(32) DEFAULT NULL,
   `name` varchar(32) DEFAULT NULL,
+  `salt` varchar(32) DEFAULT NULL,
   `create_time` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
@@ -94,8 +97,11 @@ CREATE TABLE `t_user` (
 -- ----------------------------
 -- Records of t_user
 -- ----------------------------
-INSERT INTO `t_user` VALUES ('2', 'lance', 'e10adc3949ba59abbe56e057f20f883e', 'Lance', '2016-06-02 23:35:38');
-INSERT INTO `t_user` VALUES ('1', 'admin', 'e10adc3949ba59abbe56e057f20f883e', 'Admin', '2016-06-01 23:35:17');
+--INSERT INTO `t_user` VALUES ('2', 'lance', 'e10adc3949ba59abbe56e057f20f883e', 'Lance', '2016-06-02 23:35:38');
+--INSERT INTO `t_user` VALUES ('1', 'admin', 'e10adc3949ba59abbe56e057f20f883e', 'Admin', '2016-06-01 23:35:17');
+INSERT INTO `t_user` VALUES ('1', 'admin', 'd38fd15abeccac105f68a5b04a42dba1', 'Admin','a2ef255b642a3b44680424d98b238185' ,'2016-06-01 23:35:17');
+INSERT INTO `t_user` VALUES ('2', 'lance', 'dOXNZxBcCVQR0Q4bPZhTUg==', 'Lance','d8e4c00f5d61b8132ab059df141cb8da' ,'2016-06-02 23:35:38');
+
 
 -- ----------------------------
 -- Table structure for `t_user_role`
@@ -112,3 +118,4 @@ CREATE TABLE `t_user_role` (
 -- Records of t_user_role
 -- ----------------------------
 INSERT INTO `t_user_role` VALUES ('1', '1', '1');
+INSERT INTO `t_user_role` VALUES ('1', '1', '2');

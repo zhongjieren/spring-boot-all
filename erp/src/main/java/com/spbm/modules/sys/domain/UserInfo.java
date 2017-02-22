@@ -11,6 +11,7 @@ public class UserInfo implements Serializable {
 	private String password;
 	private String name;
 	private Date createTime;
+	private String salt;//加密密码的盐
 	
 	public int getId() {
 		return id;
@@ -42,4 +43,20 @@ public class UserInfo implements Serializable {
 	public void setCreateTime(Date createTime) {
 		this.createTime = createTime;
 	}
+	
+	public String getSalt() {
+		return salt;
+	}
+
+	public void setSalt(String salt) {
+		this.salt = salt;
+	}
+	/**
+	 * 密码盐.
+	 * @return
+	 */
+	public String getCredentialsSalt(){
+		return this.account+this.salt;
+	}
+
 }
