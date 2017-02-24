@@ -4,29 +4,31 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
-import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.Permission;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
-import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.util.ByteSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import com.spbm.common.config.Global;
 import com.spbm.common.security.shiro.bean.UsernamePasswordToken;
-import com.spbm.common.security.shiro.filter.RetryLimitHashedCredentialsMatcher;
-import com.spbm.common.utils.SpringContextUtil;
-import com.spbm.modules.sys.domain.UserInfo;
-import com.spbm.modules.sys.services.UserService;
+import com.spbm.common.utils.Encodes;
+import com.spbm.common.utils.SpringContextHolder;
+import com.spbm.common.utils.StringUtils;
+import com.spbm.common.web.Servlets;
+import com.spbm.modules.sys.domain.Menu;
+import com.spbm.modules.sys.domain.Role;
+import com.spbm.modules.sys.domain.User;
+import com.spbm.modules.sys.services.SystemService;
+import com.spbm.modules.sys.utils.LogUtils;
 import com.spbm.modules.sys.utils.UserUtils;
 
 /**
@@ -36,8 +38,11 @@ import com.spbm.modules.sys.utils.UserUtils;
  */
 @Component("userRealm")
 public class SystemAuthorizingRealm extends AuthorizingRealm {
-	@Autowired
-	private UserService userService;
+//	@Autowired
+//	private UserService userService;
+	private Logger logger = LoggerFactory.getLogger(getClass());
+	
+	private SystemService systemService;
 
 	public SystemAuthorizingRealm() {
 		setName("UserRealm");
@@ -51,24 +56,34 @@ public class SystemAuthorizingRealm extends AuthorizingRealm {
 	protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authcToken) throws AuthenticationException {
 		UsernamePasswordToken token = (UsernamePasswordToken) authcToken;
 //		String userName = token.getUsername();
-		System.out.println("----->>userInfo="+token.getUsername());
+//		System.out.println("----->>userInfo="+token.getUsername());
 		
-		UserInfo userInfo = userService.findByAccount(token.getUsername());
+		int activeSessionSize = getSystemService().getSessionDao().getActiveSessions(false).size();
+		if (logger.isDebugEnabled()){
+			logger.debug("login submit, active session size: {}, username: {}", activeSessionSize, token.getUsername());
+		}
 		
-		if (userInfo != null) {
+		
+//		UserInfo userInfo = userService.findByAccount(token.getUsername());
+//		
+//		if (userInfo != null) {
+		// 校验用户名密码
+		User user = getSystemService().getUserByLoginName(token.getUsername());
+		if (user != null) {
 			//是否被禁用
-			
+			if (Global.NO.equals(user.getLoginFlag())){
+				throw new AuthenticationException("msg:该已帐号禁止登录.");
+			}
 			//加密方式;
 //			byte[] salt = Encodes.decodeHex(userInfo.getPassword().substring(0,16));
-			
+			byte[] salt = Encodes.decodeHex(user.getPassword().substring(0,16));
 			//交给AuthenticatingRealm使用CredentialsMatcher进行密码匹配，如果觉得人家的不好可以自定义实现
-			SimpleAuthenticationInfo authenticationInfo = new SimpleAuthenticationInfo(
-					userInfo, //用户名
-					userInfo.getPassword(), //密码
-	                ByteSource.Util.bytes(userInfo.getCredentialsSalt()),//salt=account +salt
+			return new SimpleAuthenticationInfo(
+					new Principal(user, token.isMobileLogin()), //用户名
+					user.getPassword().substring(16), //密码
+	                ByteSource.Util.bytes(salt),//salt=account +salt
 	                getName()  //realm name
 	        );
-			return authenticationInfo;
 			 //明文: 若存在，将此用户存放到登录认证info中，无需自己做密码对比，Shiro会为我们进行密码对比校验
 //			SimpleAuthenticationInfo authenticationInfo = new SimpleAuthenticationInfo(
 //					userName, 
@@ -81,18 +96,45 @@ public class SystemAuthorizingRealm extends AuthorizingRealm {
 	//权限资源角色in
 	@Override
 	protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
-		UserInfo userinfo = (UserInfo) getAvailablePrincipal(principals);
+		Principal principal = (Principal) getAvailablePrincipal(principals);
 //		String username = (String) principals.getPrimaryPrincipal();
-		SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
-		userinfo = userService.findByAccount(userinfo.getAccount());
-		//add Permission Resources
-		info.setStringPermissions(userService.findPermissions(userinfo.getAccount()));
-		//add Roles String[Set<String> roles]
-		// 添加用户权限
-		info.addStringPermission("user");
-		//info.setRoles(roles);
-		info.addRole("user");
-		return info;
+		User user = getSystemService().getUserByLoginName(principal.getLoginName());
+		if (user != null) {
+			SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
+			List<Menu> list = UserUtils.getMenuList();
+			for (Menu menu : list){
+				if (StringUtils.isNotBlank(menu.getPermission())){
+					// 添加基于Permission的权限信息
+					for (String permission : StringUtils.split(menu.getPermission(),",")){
+						info.addStringPermission(permission);
+					}
+				}
+			}
+			// 添加用户权限
+			info.addStringPermission("user");
+			// 添加用户角色信息
+			for (Role role : user.getRoleList()){
+				info.addRole(role.getEnname());
+			}
+			// 更新登录IP和时间
+			getSystemService().updateUserLoginInfo(user);
+			// 记录登录日志
+			LogUtils.saveLog(Servlets.getRequest(), "系统登录");
+			return info;
+		} else {
+			return null;
+		}
+		
+//		SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
+//		UserInfo userinfo = userService.findByAccount(principal.getLoginName());
+//		//add Permission Resources
+//		info.setStringPermissions(userService.findPermissions(userinfo.getAccount()));
+//		//add Roles String[Set<String> roles]
+//		// 添加用户权限
+//		info.addStringPermission("user");
+//		//info.setRoles(roles);
+//		info.addRole("user");
+//		return info;
 	}
 	
 	
@@ -137,27 +179,37 @@ public class SystemAuthorizingRealm extends AuthorizingRealm {
 	}
 	
 	/**
+	 * 获取系统业务对象
+	 */
+	public SystemService getSystemService() {
+		if (systemService == null){
+			systemService = SpringContextHolder.getBean(SystemService.class);
+		}
+		return systemService;
+	}
+	
+	/**
 	 * 授权用户信息
 	 */
 	public static class Principal implements Serializable {
 
 		private static final long serialVersionUID = 1L;
 		
-		private int id; // 编号
+		private String id; // 编号
 		private String loginName; // 登录名
 		private String name; // 姓名
 		private boolean mobileLogin; // 是否手机登录
 		
 //		private Map<String, Object> cacheMap;
 
-		public Principal(UserInfo user, boolean mobileLogin) {
+		public Principal(User user, boolean mobileLogin) {
 			this.id = user.getId();
-			this.loginName = user.getAccount();
+			this.loginName = user.getLoginName();
 			this.name = user.getName();
 			this.mobileLogin = mobileLogin;
 		}
 
-		public int getId() {
+		public String getId() {
 			return id;
 		}
 
@@ -194,9 +246,10 @@ public class SystemAuthorizingRealm extends AuthorizingRealm {
 		
 		@Override
 		public String toString() {
-			return String.valueOf(id);
+			return id;
 		}
 
 	}
+	 
 	
 }

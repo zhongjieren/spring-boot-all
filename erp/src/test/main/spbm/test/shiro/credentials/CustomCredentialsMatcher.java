@@ -9,14 +9,10 @@ import org.apache.shiro.authc.credential.SimpleCredentialsMatcher;
 import org.apache.shiro.codec.Base64;
 import org.apache.shiro.codec.Hex;
 import org.apache.shiro.crypto.AesCipherService;
-import org.apache.shiro.crypto.hash.Md5Hash;
 import org.apache.shiro.crypto.hash.Sha384Hash;
-import org.apache.shiro.util.ByteSource;
 
 import com.spbm.common.security.encrypt.Digests;
 import com.spbm.common.utils.Encodes;
-import com.spbm.common.utils.JsonUtil;
-import com.spbm.modules.sys.domain.UserInfo;
 
 public class CustomCredentialsMatcher extends SimpleCredentialsMatcher {
 
@@ -82,20 +78,20 @@ public class CustomCredentialsMatcher extends SimpleCredentialsMatcher {
      * @param password 密码 
      * @return 密文和salt 
      */ 
-    public static UserInfo md5Password(String username,String password){ 
+    public static void md5Password(String username,String password){ 
 //    	SecureRandomNumberGenerator secureRandomNumberGenerator=new SecureRandomNumberGenerator();
 //        String salt = secureRandomNumberGenerator.nextBytes().toHex(); 
     	String salt = "8d78869f470951332959580424d4bf4f";
 //    	byte[] salt = Digests.generateSalt(SALT_SIZE);
         //组合username,两次迭代，对密码进行加密 
-        String md5Pwd= new Md5Hash(password, ByteSource.Util.bytes(username+salt),2).toBase64();
-        UserInfo user=new UserInfo(); 
-        user.setPassword(md5Pwd); 
-        user.setSalt(salt); 
-        user.setAccount(username); 
-        System.out.println("UserInfoJson:"+JsonUtil.getJson(user));
-        
-        return user; 
+//        String md5Pwd= new Md5Hash(password, ByteSource.Util.bytes(username+salt),2).toBase64();
+//        UserInfo user=new UserInfo(); 
+//        user.setPassword(md5Pwd); 
+//        user.setSalt(salt); 
+//        user.setAccount(username); 
+//        System.out.println("UserInfoJson:"+JsonUtil.getJson(user));
+//        
+        return  ; 
     } 
 	/**
 	 * base64进制解密

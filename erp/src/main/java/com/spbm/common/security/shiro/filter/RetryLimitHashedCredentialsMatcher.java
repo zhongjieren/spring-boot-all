@@ -8,12 +8,17 @@ import org.apache.shiro.authc.ExcessiveAttemptsException;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheManager;
+import org.springframework.beans.factory.annotation.Value;
 
 import com.spbm.common.utils.JsonUtil;
 
 public class RetryLimitHashedCredentialsMatcher extends
 		HashedCredentialsMatcher {
+	
+	@Value("${application.retryCount:3}")
+	private int retryLimitCount = 3;
 
+	
 	private Cache<String, AtomicInteger> passwordRetryCache;
 
 	public RetryLimitHashedCredentialsMatcher(CacheManager cacheManager) {
@@ -29,8 +34,9 @@ public class RetryLimitHashedCredentialsMatcher extends
 		if (retryCount == null) {
 			retryCount = new AtomicInteger(0);
 			passwordRetryCache.put(username, retryCount);
-		}
-		if (retryCount.incrementAndGet() > 5) {
+		} 
+		
+		if (retryCount.incrementAndGet() > retryLimitCount) {
 			// if retry count > 5 throw
 			throw new ExcessiveAttemptsException();
 		}

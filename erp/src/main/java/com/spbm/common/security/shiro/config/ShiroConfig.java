@@ -28,6 +28,7 @@ import com.spbm.common.security.shiro.filter.URLPermissionsShiroFilter;
 @Configuration
 public class ShiroConfig {
 	
+	
 	/**
 	 * FilterRegistrationBean
 	 * @return
@@ -51,10 +52,11 @@ public class ShiroConfig {
 		ShiroFilterFactoryBean bean = new ShiroFilterFactoryBean();
 		bean.setSecurityManager(securityManager());
 		bean.setLoginUrl("/login");
+		bean.setSuccessUrl("/login");
 		bean.setUnauthorizedUrl("/unauthor");
 		
 		Map<String, Filter> filters = Maps.newHashMap();
-		filters.put("perms", urlPermissionsFilter());
+//		filters.put("perms", urlPermissionsFilter());
 		filters.put("anon", new AnonymousFilter());
 		filters.put("authc", new FormAuthenticationFilter());
 		bean.setFilters(filters);

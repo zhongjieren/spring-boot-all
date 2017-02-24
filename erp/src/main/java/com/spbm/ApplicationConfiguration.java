@@ -3,13 +3,10 @@ package com.spbm;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Import;
-
-import com.spbm.common.utils.SpringContextUtil;
 
 @SpringBootApplication
 @MapperScan("com.spbm.modules.**.dao")
-@Import(value={SpringContextUtil.class}) 
+//@Import(value={SpringContextUtil.class}) 
 public class ApplicationConfiguration {
 	
 	public static void main(String[] args) {

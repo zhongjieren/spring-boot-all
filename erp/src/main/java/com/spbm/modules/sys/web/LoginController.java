@@ -3,7 +3,6 @@ package com.spbm.modules.sys.web;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.util.WebUtils;
 import org.springframework.stereotype.Controller;
@@ -11,15 +10,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.spbm.common.security.shiro.bean.UsernamePasswordToken;
 import com.spbm.common.security.shiro.config.SystemAuthorizingRealm.Principal;
 import com.spbm.common.security.shiro.filter.FormAuthenticationFilter;
-import com.spbm.common.utils.HttpRequestUtil;
 import com.spbm.common.utils.StringUtils;
+import com.spbm.common.web.BaseController;
 import com.spbm.modules.sys.utils.UserUtils;
 
 @Controller
-public class LoginController {
+public class LoginController extends BaseController{
 
 	
 	/**
@@ -84,17 +82,17 @@ public class LoginController {
 //			rediect.addFlashAttribute("errorText", "您的账号或密码输入错误!");
 //			return "redirect:/login";
 //		}
-		return "redirect:/index";
+		return "redirect:"+this.adminPath+"/index";
 	}
 	
 	/**
 	 * Exit
 	 * @return
 	 */
-	@RequestMapping("logout")
+	@RequestMapping("${application.adminPath}/logout")
 	public String logout() {
 		Subject subject = SecurityUtils.getSubject();
 		subject.logout();
-		return "redirect:/index";
+		return "redirect:"+this.adminPath+"/index";
 	}
 }

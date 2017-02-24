@@ -5,7 +5,6 @@ import java.util.Set;
 
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheManager;
-import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,7 +16,7 @@ import org.slf4j.LoggerFactory;
 public class CacheUtils {
 	
 	private static Logger logger = LoggerFactory.getLogger(CacheUtils.class);
-	private static CacheManager cacheManager =SpringContextUtil.getBean(EhCacheManager.class);
+	private static CacheManager cacheManager = SpringContextHolder.getBean(CacheManager.class);
 	
 	private static final String SYS_CACHE = "sysCache";
 

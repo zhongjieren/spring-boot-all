@@ -1,44 +1,34 @@
 package com.spbm.common.security.shiro.filter;
 
-import java.io.IOException;
-import java.util.List;
-
 import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.filter.authz.PermissionsAuthorizationFilter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import com.spbm.modules.sys.domain.UserInfo;
-import com.spbm.modules.sys.services.UserService;
 
 @Component("urlPermissionsFilter")
 public class URLPermissionsShiroFilter extends PermissionsAuthorizationFilter{
-	@Autowired
-	private UserService userService;
+//	@Autowired
+//	private UserService userService;
 
-	@Override
-	public boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) throws IOException {
-		String curUrl = getRequestUrl(request);
-		Subject subject = SecurityUtils.getSubject();
-		
-		if(subject.getPrincipal() == null 
-				|| StringUtils.endsWithAny(curUrl, ".js",".css",".html")
-				|| StringUtils.endsWithAny(curUrl, ".jpg",".png",".gif", ".jpeg")
-				|| StringUtils.equals(curUrl, "/unauthor")) {
-			return true;
-		}
-		UserInfo userinfo = (UserInfo)subject.getPrincipal();
+//	@Override
+//	public boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) throws IOException {
+//		String curUrl = getRequestUrl(request);
+//		Subject subject = SecurityUtils.getSubject();
+//		
+//		if(subject.getPrincipal() == null 
+//				|| StringUtils.endsWithAny(curUrl, ".js",".css",".html")
+//				|| StringUtils.endsWithAny(curUrl, ".jpg",".png",".gif", ".jpeg")
+//				|| StringUtils.equals(curUrl, "/unauthor")) {
+//			return true;
+//		}
+////		UserInfo userinfo = (UserInfo)subject.getPrincipal();
 //		Principal principal = (Principal)subject.getPrincipal();
-		List<String> urls = userService.findPermissionUrl(userinfo.getAccount());
-		
-		return urls.contains(curUrl);
-	}
+//		List<String> urls = userService.findPermissionUrl(principal.getLoginName());
+//		
+//		return urls.contains(curUrl);
+//	}
 	
 	
 	

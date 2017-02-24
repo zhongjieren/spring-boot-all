@@ -1,16 +1,20 @@
 package com.spbm.modules.sys.web;
 
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-@Controller
-public class IndexController {
+import com.spbm.common.web.BaseController;
 
+@Controller
+public class IndexController extends BaseController{
+	
 	/**
 	 * Go Index
 	 * @return
 	 */
-	@RequestMapping(value={"", "/", "index"})
+	@RequiresPermissions("user")
+	@RequestMapping(value={"", "${application.adminPath}/", "${application.adminPath}/index"})
 	public String index() {
 		return "index";
 	}
@@ -18,8 +22,8 @@ public class IndexController {
 	/**
 	 * unauthor
 	 * @return
-	 */
-	@RequestMapping("unauthor")
+	 */ 
+	@RequestMapping("${application.adminPath}/unauthor")
 	public String unauthor() {
 		return "unauthor";
 	}
@@ -28,7 +32,8 @@ public class IndexController {
 	 * reports
 	 * @return
 	 */
-	@RequestMapping("reports")
+	@RequiresPermissions("user")
+	@RequestMapping("${application.adminPath}/reports")
 	public String reports() {
 		return "reports";
 	}
