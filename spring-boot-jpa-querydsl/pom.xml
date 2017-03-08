@@ -16,7 +16,7 @@
 
 	<properties>
 		<hibernate.version>5.2.4.Final</hibernate.version>
-		<java.version>1.8</java.version>
+		<java.version>1.7</java.version>
 	</properties>
 	<dependencies>
 		<dependency>
