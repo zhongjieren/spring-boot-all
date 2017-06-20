@@ -38,10 +38,10 @@ public class LoginServiceImpl implements LoginService {
 			throw new ServiceException("用户名不存在");
 		}
 		
-		String password = EncryptUtils.encryptMD5(user.getPassword());
-		if(!StringUtils.equals(password, userEntity.getPassword())){
-			throw new ServiceException("密码输入错误");
-		}
+//		String password = EncryptUtils.encryptMD5(user.getPassword());
+//		if(!StringUtils.equals(password, userEntity.getPassword())){
+//			throw new ServiceException("密码输入错误");
+//		}
 		
 		return userEntity;
 	}
